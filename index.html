@@ -177,20 +177,19 @@
 
 <script>
 const somo = {
-    db: JSON.parse(localStorage.getItem('somo_v9')) || {
+    db: JSON.parse(localStorage.getItem('somo_v10')) || {
         products: [
-           { id: 1, name: "Premium Bundle", price: 99, img: "logo .jpeg", type: 'main', out: false },
+            { id: 1, name: "Premium Bundle", price: 99, img: "logo .jpeg", type: 'main', out: false },
             { id: 2, name: "Golden Offer", price: 150, img: "golden offer.jpeg", type: 'main', out: false },
             { id: 3, name: "Custom Sticker", price: 15, img: "product5.jpeg", type: 'sticker', out: false },
             { id: 4, name: "Privacy Protector", price: 45, img: "screen protection1.jpeg", type: 'protection', out: false },
-            { id: 5, name: "Clear Protector", price: 35, img: "screen protection2.jpeg", type: 'protection', out: false }
-    
+            { id: 5, name: "Clear Protector", price: 35, img: "screen protection2.jpeg", type: 'protection', out: false },
+            { id: 6, name: "Luxury Leather Cover", price: 120, img: "logo .jpeg", type: 'cover', out: false }
         ],
         stats: { rev: 0, orders: 0 },
         giftCards: []
     },
     cart: [],
-    // ... the rest of your code remains the same
     activeGC: null,
 
     init() { 
@@ -199,7 +198,7 @@ const somo = {
         if(sessionStorage.getItem('adminAuth') === 'true') this.showAdmin();
     },
 
-    save() { localStorage.setItem('somo_v9', JSON.stringify(this.db)); },
+    save() { localStorage.setItem('somo_v10', JSON.stringify(this.db)); },
 
     tryAdmin() {
         if(sessionStorage.getItem('adminAuth') === 'true') {
@@ -214,8 +213,10 @@ const somo = {
     },
 
     showAdmin() {
-        document.getElementById('adminPanel').style.display = 'block';
-        document.getElementById('adminToggleBtn').innerText = 'Exit Admin';
+        const panel = document.getElementById('adminPanel');
+        if(panel) panel.style.display = 'block';
+        const btn = document.getElementById('adminToggleBtn');
+        if(btn) btn.innerText = 'Exit Admin';
         this.render();
     },
 
@@ -228,12 +229,34 @@ const somo = {
         };
         const isAdmin = sessionStorage.getItem('adminAuth') === 'true';
         
-        // Clear grids before redraw
-        Object.values(grids).forEach(g => g.innerHTML = "");
+        Object.values(grids).forEach(g => { if(g) g.innerHTML = ""; });
 
         this.db.products.forEach(p => {
             if(filter && !p.name.toLowerCase().includes(filter.toLowerCase())) return;
             
+            // Add iPhone dropdown ONLY for covers
+            let modelSelector = '';
+            if(p.type === 'cover') {
+                modelSelector = `
+                <select id="model-${p.id}" style="margin-bottom:15px; font-size:12px; padding:10px;">
+                    <option value="iPhone 13">iPhone 13</option>
+                    <option value="iPhone 13 Pro">iPhone 13 Pro</option>
+                    <option value="iPhone 13 Pro Max">iPhone 13 Pro Max</option>
+                    <option value="iPhone 14">iPhone 14</option>
+                    <option value="iPhone 14 Pro">iPhone 14 Pro</option>
+                    <option value="iPhone 14 Pro Max">iPhone 14 Pro Max</option>
+                    <option value="iPhone 15">iPhone 15</option>
+                    <option value="iPhone 15 Pro">iPhone 15 Pro</option>
+                    <option value="iPhone 15 Pro Max">iPhone 15 Pro Max</option>
+                    <option value="iPhone 16">iPhone 16</option>
+                    <option value="iPhone 16 Pro">iPhone 16 Pro</option>
+                    <option value="iPhone 16 Pro Max">iPhone 16 Pro Max</option>
+                    <option value="iPhone 17">iPhone 17</option>
+                    <option value="iPhone 17 Pro">iPhone 17 Pro</option>
+                    <option value="iPhone 17 Pro Max">iPhone 17 Pro Max</option>
+                </select>`;
+            }
+
             const card = `
             <div class="card ${p.out ? 'sold-out' : ''}">
                 ${p.out ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
@@ -241,6 +264,7 @@ const somo = {
                 <div class="card-body">
                     <p style="font-weight:700;">${p.name}</p>
                     <p class="price">${p.price} QR</p>
+                    ${modelSelector}
                     <button class="btn btn-gold" onclick="somo.addToCart(${p.id})">${p.out ? 'Sold Out' : 'Add to Cart'}</button>
                     ${isAdmin ? `
                         <div style="margin-top:10px; display:flex; gap:5px;">
@@ -259,15 +283,31 @@ const somo = {
 
     addToCart(id) {
         const product = this.db.products.find(x => x.id === id);
-        if(product.out) return;
-        const existing = this.cart.find(x => x.id === id);
-        existing ? existing.qty++ : this.cart.push({ ...product, qty: 1 });
+        if(!product || product.out) return;
+
+        let selectedModel = '';
+        if (product.type === 'cover') {
+            const dropdown = document.getElementById(`model-${id}`);
+            if (dropdown) selectedModel = dropdown.value;
+        }
+
+        const cartItemName = selectedModel ? `${product.name} (${selectedModel})` : product.name;
+        const existing = this.cart.find(x => x.id === id && x.model === selectedModel);
+        
+        if (existing) {
+            existing.qty++;
+        } else {
+            this.cart.push({ ...product, name: cartItemName, model: selectedModel, qty: 1 });
+        }
+        
         this.updateCartUI();
         toggleCart(true);
     },
 
     updateCartUI() {
-        document.getElementById('cartList').innerHTML = this.cart.map((item, idx) => `
+        const list = document.getElementById('cartList');
+        if(!list) return;
+        list.innerHTML = this.cart.map((item, idx) => `
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:10px;">
                 <div><p style="font-weight:700;">${item.name}</p><p style="color:var(--gold); font-size:12px;">${item.price} QR x ${item.qty}</p></div>
                 <button onclick="somo.remCart(${idx})" style="color:red; background:none; border:none; cursor:pointer;">&times;</button>
@@ -313,10 +353,17 @@ const somo = {
 
     checkout() {
         let name = document.getElementById('custName').value;
-        if(!name || this.cart.length === 0) return alert("Missing Info");
+        let phone = document.getElementById('custPhone').value;
+        let payment = document.getElementById('payMethod').value;
+        
+        if(!name || this.cart.length === 0) return alert("Please enter your name and add items to your cart.");
+        
         let items = this.cart.map(i => `• ${i.name} (x${i.qty})`).join('%0A');
         let total = document.getElementById('totalT').innerText;
-        window.open(`https://wa.me/97433123213?text=⚜️ *NEW ORDER*%0A*Name:* ${name}%0A*Order:*%0A${items}%0A*Total:* ${total}`);
+        
+        let message = `⚜️ *NEW ORDER* ⚜️%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Payment Method:* ${payment}%0A%0A*Order Details:*%0A${items}%0A%0A*Total:* ${total}`;
+        
+        window.open(`https://wa.me/97433123213?text=${message}`);
         this.db.stats.rev += parseInt(total); this.db.stats.orders++; this.save();
         this.cart = []; this.updateCartUI(); toggleCart(false); this.updateStats();
     },
@@ -334,22 +381,29 @@ const somo = {
 
     toggleStock(id) {
         let p = this.db.products.find(x => x.id === id);
-        p.out = !p.out; this.save(); this.render();
+        if(p) { p.out = !p.out; this.save(); this.render(); }
     },
 
     deleteItem(id) { this.db.products = this.db.products.filter(x => x.id !== id); this.save(); this.render(); },
+    
     updateStats() {
-        document.getElementById('revStat').innerText = this.db.stats.rev + " QR";
-        document.getElementById('sealStat').innerText = this.db.stats.orders;
-        document.getElementById('invStat').innerText = this.db.products.length;
+        const rev = document.getElementById('revStat');
+        const seal = document.getElementById('sealStat');
+        const inv = document.getElementById('invStat');
+        if(rev) rev.innerText = this.db.stats.rev + " QR";
+        if(seal) seal.innerText = this.db.stats.orders;
+        if(inv) inv.innerText = this.db.products.length;
     }
 };
 
 function toggleCart(open) {
-    document.getElementById('cartSidebar').classList.toggle('active', open);
-    document.getElementById('overlay').classList.toggle('active', open);
+    const side = document.getElementById('cartSidebar');
+    const over = document.getElementById('overlay');
+    if(side) side.classList.toggle('active', open);
+    if(over) over.classList.toggle('active', open);
 }
 
+// Start the app
 somo.init();
 </script>
 </body>
