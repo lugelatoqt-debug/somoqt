@@ -14,6 +14,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); overflow-x: hidden; scroll-behavior: smooth; }
+        body[dir="rtl"] { font-family: 'Inter', sans-serif; }
 
         /* Navigation */
         nav { 
@@ -25,6 +26,9 @@
         .logo { height: 45px; cursor: pointer; transition: 0.3s; }
         .nav-actions { display: flex; gap: 15px; align-items: center; }
         
+        /* Language Toggle */
+        .lang-btn { background: var(--surface); color: var(--gold); border: 1px solid var(--gold); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: 700; font-size: 12px; }
+
         /* Search Bar */
         .search-container { padding: 20px 6% 0; }
         .search-bar { width: 100%; padding: 15px 25px; background: var(--surface); border: 1px solid var(--border); border-radius: 30px; color: #fff; outline: none; transition: 0.3s; }
@@ -46,21 +50,76 @@
         .card { background: var(--surface); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: 0.3s; position: relative; }
         .card.sold-out { opacity: 0.5; }
         .sold-out-badge { position: absolute; top: 10px; right: 10px; background: var(--error); color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 10; }
-        .card-img { width: 100%; height: 280px; object-fit: contain; background: #fff; padding: 20px; }
+        .card-img { width: 100%; height: 280px; object-fit: contain; background: #fff; padding: 20px; cursor: zoom-in; }
         .card-body { padding: 20px; text-align: center; }
         .price { font-size: 22px; font-weight: 800; color: var(--gold); margin: 10px 0; }
 
         /* Sidebar */
         .sidebar { position: fixed; top: 0; right: -100%; width: 100%; max-width: 450px; height: 100vh; background: #0e0e10; z-index: 2000; transition: 0.4s; padding: 35px; overflow-y: auto; border-left: 1px solid var(--border); }
+        body[dir="rtl"] .sidebar { right: auto; left: -100%; border-left: none; border-right: 1px solid var(--border); }
         .sidebar.active { right: 0; }
+        body[dir="rtl"] .sidebar.active { left: 0; }
+        
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; display: none; backdrop-filter: blur(4px); }
         .overlay.active { display: block; }
+
+        /* Close Buttons */
+        .close-btn {
+            position: absolute; top: 25px; right: 25px;
+            background: rgba(255,255,255,0.1); border: none; color: #fff;
+            width: 40px; height: 40px; border-radius: 50%;
+            font-size: 24px; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+        }
+        body[dir="rtl"] .close-btn { right: auto; left: 25px; }
+        .close-btn:hover { background: var(--error); color: #fff; transform: scale(1.1); }
         
         /* Buttons/Inputs */
         .btn { padding: 14px; border-radius: 10px; font-weight: 800; cursor: pointer; border: none; text-transform: uppercase; width: 100%; transition: 0.2s; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
         input, select { width: 100%; padding: 14px; background: #1a1a1c; border: 1px solid #333; color: #fff; border-radius: 10px; margin-top: 10px; outline: none; }
+
+        /* Image View Modal */
+        #imgViewModal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px); padding: 20px;
+        }
+        #imgViewModal img {
+            max-width: 90%; max-height: 80vh; border-radius: 15px;
+            border: 2px solid var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.2);
+            object-fit: contain; background: #fff;
+        }
+
+        /* Floating Cart Icon */
+        .floating-cart {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--gold); color: #000;
+            width: 65px; height: 65px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            cursor: pointer; z-index: 999; transition: transform 0.3s;
+        }
+        body[dir="rtl"] .floating-cart { right: auto; left: 30px; }
+        .floating-cart:hover { transform: scale(1.1); }
+        .floating-cart-count {
+            position: absolute; top: -5px; right: -5px;
+            background: #fff; color: #000; font-size: 13px; font-weight: 900;
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--gold);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: -100px; left: 50%;
+            transform: translateX(-50%); background: var(--gold); color: #000;
+            padding: 12px 25px; border-radius: 30px; font-weight: 700;
+            z-index: 3000; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { bottom: 30px; }
 
         /* Footer */
         footer { padding: 80px 6%; background: #08080a; border-top: 1px solid var(--border); margin-top: 80px; }
@@ -75,6 +134,7 @@
 <nav>
     <img src="logo .jpeg" class="logo" alt="SOMO" onclick="location.reload()">
     <div class="nav-actions">
+        <button class="lang-btn" onclick="somo.toggleLang()" id="langToggle">AR</button>
         <button class="btn btn-outline" id="adminToggleBtn" style="width:auto; padding:8px 15px;" onclick="somo.tryAdmin()">Admin Panel</button>
         <div class="cart-btn" onclick="toggleCart(true)" style="position:relative; cursor:pointer;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
@@ -113,70 +173,104 @@
 </div>
 
 <div class="search-container">
-    <input type="text" class="search-bar" placeholder="Search products..." oninput="somo.filterShop(this.value)">
+    <input type="text" id="searchBar" class="search-bar" placeholder="Search products..." oninput="somo.filterShop(this.value)">
 </div>
 
 <div id="shop">
-    <h2 class="section-title">Premium Collection</h2>
+    <h2 class="section-title" id="title-main">Premium Collection</h2>
     <div class="grid" id="mainGrid"></div>
-    
-    <h2 class="section-title">Phone Covers</h2>
+    <h2 class="section-title" id="title-cover">Phone Covers</h2>
     <div class="grid" id="coverGrid"></div>
-
-    <h2 class="section-title">Screen Protection</h2>
+    <h2 class="section-title" id="title-protection">Screen Protection</h2>
     <div class="grid" id="protectionGrid"></div>
-
-    <h2 class="section-title">Stickers</h2>
+    <h2 class="section-title" id="title-sticker">Stickers</h2>
     <div class="grid" id="stickerGrid"></div>
 </div>
 
+<div id="imgViewModal">
+    <button class="close-btn" onclick="somo.closeModal()">&times;</button>
+    <img id="fullImg" src="" alt="View">
+</div>
+
+<div class="floating-cart" onclick="toggleCart(true)">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    <span id="floatingCartCount" class="floating-cart-count">0</span>
+</div>
+
+<div id="cartToast" class="toast">Added to Cart! 🛒</div>
+
 <div class="overlay" id="overlay" onclick="toggleCart(false)"></div>
 <div class="sidebar" id="cartSidebar">
-    <h2 style="font-family:'Syncopate'; color:var(--gold); margin-bottom:30px;">Your Cart</h2>
+    <button class="close-btn" onclick="toggleCart(false)">&times;</button>
+    <h2 id="cartHeader" style="font-family:'Syncopate'; color:var(--gold); margin-bottom:30px;">Your Cart</h2>
     <div id="cartList"></div>
     
     <div style="background:#1a1a1c; padding:20px; border-radius:15px; margin:25px 0; border:1px dashed #444;">
-        <small>Gift Card</small>
+        <small id="gcLabel">Gift Card</small>
         <div style="display:flex; gap:10px; margin-top:8px;">
             <input type="text" id="gcIn" placeholder="Code" style="margin:0; height:45px;">
-            <button class="btn btn-gold" style="width:70px; height:45px; padding:0;" onclick="somo.applyGC()">Apply</button>
+            <button class="btn btn-gold" id="gcApplyBtn" style="width:70px; height:45px; padding:0;" onclick="somo.applyGC()">Apply</button>
         </div>
         <p id="gcStatus" style="font-size:11px; margin-top:8px;"></p>
     </div>
 
     <input type="text" id="custName" placeholder="Full Name">
     <input type="text" id="custPhone" placeholder="WhatsApp Number">
-    <select id="payMethod"><option>Cash on Delivery</option><option>Apple Pay</option><option>Bank Transfer</option></select>
+    <select id="payMethod"><option value="cod">Cash on Delivery</option><option value="apple">Apple Pay</option><option value="bank">Bank Transfer</option></select>
 
     <div style="margin-top:30px; border-top:1px solid #222; padding-top:20px;">
-        <div style="display:flex; justify-content:space-between; opacity:0.6;"><span>Subtotal</span><span id="subT">0 QR</span></div>
-        <div style="display:flex; justify-content:space-between; color:var(--gold); font-size:24px; font-weight:900; margin-top:10px;"><span>Total</span><span id="totalT">0 QR</span></div>
+        <div style="display:flex; justify-content:space-between; opacity:0.6;"><span id="subtotalLabel">Subtotal</span><span id="subT">0 QR</span></div>
+        <div style="display:flex; justify-content:space-between; color:var(--gold); font-size:24px; font-weight:900; margin-top:10px;"><span id="totalLabel">Total</span><span id="totalT">0 QR</span></div>
     </div>
-    <button class="btn btn-gold" style="margin-top:25px; height:60px;" onclick="somo.checkout()">Order via WhatsApp</button>
+    <button class="btn btn-gold" id="checkoutBtn" style="margin-top:25px; height:60px;" onclick="somo.checkout()">PROCEED TO CHECKOUT</button>
 </div>
 
 <footer>
     <div class="footer-grid">
         <div class="footer-col">
-            <h4>Follow Us</h4>
+            <h4 id="footerFollow">Follow Us</h4>
            <a href="https://www.instagram.com/somoqr" class="social-icon">Instagram</a>
           <a href="https://www.tiktok.com/@somoqr0" target="_blank">TikTok</a>
            <a href="https://www.snapchat.com/add/somophone" target="_blank">Snapchat</a>
         </div>
         <div class="footer-col">
-            <h4>Support</h4>
+            <h4 id="footerSupport">Support</h4>
             <a href="https://wa.me/97433123213" target="_blank">Contact WhatsApp</a>
             <a href="#">Policies</a>
         </div>
         <div class="footer-col">
-            <h4>Doha Boutique</h4>
-            <p style="font-size:13px; color:rgba(255,255,255,0.4);">Premium Accessories.<br>Handcrafted in Qatar.</p>
+            <h4 id="footerAbout">Doha Boutique</h4>
+            <p id="footerDesc" style="font-size:13px; color:rgba(255,255,255,0.4);">Premium Accessories.<br>Handcrafted in Qatar.</p>
         </div>
     </div>
 </footer>
 
 <script>
+const i18n = {
+    en: {
+        admin: "Admin Panel", exitAdmin: "Exit Admin", search: "Search products...",
+        main: "Premium Collection", cover: "Phone Covers", protection: "Screen Protection", sticker: "Stickers",
+        cartTitle: "Your Cart", gc: "Gift Card", code: "Code", apply: "Apply",
+        name: "Full Name", phone: "WhatsApp Number", pay: "Payment Method",
+        cod: "Cash on Delivery", apple: "Apple Pay", bank: "Bank Transfer",
+        sub: "Subtotal", tot: "Total", checkout: "PROCEED TO CHECKOUT", added: "Added to Cart! 🛒",
+        soldOut: "Sold Out", addCart: "Add to Cart", follow: "Follow Us", support: "Support",
+        about: "Doha Boutique", desc: "Premium Accessories.<br>Handcrafted in Qatar."
+    },
+    ar: {
+        admin: "لوحة التحكم", exitAdmin: "خروج", search: "البحث عن المنتجات...",
+        main: "المجموعة المميزة", cover: "أغطية الهواتف", protection: "حماية الشاشة", sticker: "ملصقات",
+        cartTitle: "سلة التسوق", gc: "بطاقة هدايا", code: "الكود", apply: "تطبيق",
+        name: "الاسم الكامل", phone: "رقم الواتساب", pay: "طريقة الدفع",
+        cod: "الدفع عند الاستلام", apple: "أبل باي", bank: "تحويل بنكي",
+        sub: "المجموع", tot: "الإجمالي", checkout: "المتابعة للدفع", added: "تمت الإضافة للسلة! 🛒",
+        soldOut: "نفذت الكمية", addCart: "أضف للسلة", follow: "تابعنا", support: "الدعم",
+        about: "سومو بوتيك", desc: "إكسسوارات فاخرة.<br>صنعت في قطر."
+    }
+};
+
 const somo = {
+    lang: 'en',
     db: JSON.parse(localStorage.getItem('somo_v10')) || {
         products: [
             { id: 1, name: "Golden Offer", price: 99, img: "golden offer.jpeg", type: 'main', out: false },
@@ -199,72 +293,92 @@ const somo = {
 
     save() { localStorage.setItem('somo_v10', JSON.stringify(this.db)); },
 
+    // Modal Controls
+    openModal(src) {
+        const modal = document.getElementById('imgViewModal');
+        const img = document.getElementById('fullImg');
+        img.src = src;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scroll
+    },
+
+    closeModal() {
+        document.getElementById('imgViewModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    },
+
+    toggleLang() {
+        this.lang = this.lang === 'en' ? 'ar' : 'en';
+        document.body.dir = this.lang === 'ar' ? 'rtl' : 'ltr';
+        document.getElementById('langToggle').innerText = this.lang === 'en' ? 'AR' : 'EN';
+        this.updateUIStrings();
+        this.render();
+        this.updateCartUI();
+    },
+
+    updateUIStrings() {
+        const t = i18n[this.lang];
+        const isAdmin = sessionStorage.getItem('adminAuth') === 'true';
+        document.getElementById('adminToggleBtn').innerText = isAdmin ? t.exitAdmin : t.admin;
+        document.getElementById('searchBar').placeholder = t.search;
+        document.getElementById('title-main').innerText = t.main;
+        document.getElementById('title-cover').innerText = t.cover;
+        document.getElementById('title-protection').innerText = t.protection;
+        document.getElementById('title-sticker').innerText = t.sticker;
+        document.getElementById('cartHeader').innerText = t.cartTitle;
+        document.getElementById('gcLabel').innerText = t.gc;
+        document.getElementById('gcIn').placeholder = t.code;
+        document.getElementById('gcApplyBtn').innerText = t.apply;
+        document.getElementById('custName').placeholder = t.name;
+        document.getElementById('custPhone').placeholder = t.phone;
+        document.getElementById('subtotalLabel').innerText = t.sub;
+        document.getElementById('totalLabel').innerText = t.tot;
+        document.getElementById('checkoutBtn').innerText = t.checkout;
+        document.getElementById('cartToast').innerText = t.added;
+        document.getElementById('footerFollow').innerText = t.follow;
+        document.getElementById('footerSupport').innerText = t.support;
+        document.getElementById('footerAbout').innerText = t.about;
+        document.getElementById('footerDesc').innerHTML = t.desc;
+        const pMethod = document.getElementById('payMethod');
+        pMethod.options[0].text = t.cod; pMethod.options[1].text = t.apple; pMethod.options[2].text = t.bank;
+    },
+
     tryAdmin() {
-        if(sessionStorage.getItem('adminAuth') === 'true') {
-            sessionStorage.removeItem('adminAuth');
-            location.reload();
-            return;
-        }
-        if(prompt("Enter Admin Password:") === "1709811") {
-            sessionStorage.setItem('adminAuth', 'true');
-            this.showAdmin();
-        } else { alert("Wrong Password"); }
+        if(sessionStorage.getItem('adminAuth') === 'true') { sessionStorage.removeItem('adminAuth'); location.reload(); return; }
+        if(prompt("Enter Admin Password:") === "1709811") { sessionStorage.setItem('adminAuth', 'true'); this.showAdmin(); } else { alert("Wrong Password"); }
     },
 
     showAdmin() {
         const panel = document.getElementById('adminPanel');
         if(panel) panel.style.display = 'block';
-        const btn = document.getElementById('adminToggleBtn');
-        if(btn) btn.innerText = 'Exit Admin';
+        this.updateUIStrings();
         this.render();
     },
 
     render(filter = "") {
-        const grids = {
-            main: document.getElementById('mainGrid'),
-            sticker: document.getElementById('stickerGrid'),
-            cover: document.getElementById('coverGrid'),
-            protection: document.getElementById('protectionGrid')
-        };
+        const grids = { main: document.getElementById('mainGrid'), sticker: document.getElementById('stickerGrid'), cover: document.getElementById('coverGrid'), protection: document.getElementById('protectionGrid') };
         const isAdmin = sessionStorage.getItem('adminAuth') === 'true';
-        
+        const t = i18n[this.lang];
         Object.values(grids).forEach(g => { if(g) g.innerHTML = ""; });
 
         this.db.products.forEach(p => {
             if(filter && !p.name.toLowerCase().includes(filter.toLowerCase())) return;
-            
-            // Add iPhone dropdown ONLY for covers
-            let modelSelector = '';
-            if(p.type === 'cover') {
-                modelSelector = `
+            let modelSelector = p.type === 'cover' ? `
                 <select id="model-${p.id}" style="margin-bottom:15px; font-size:12px; padding:10px;">
-                    <option value="iPhone 13">iPhone 13</option>
-                    <option value="iPhone 13 Pro">iPhone 13 Pro</option>
-                    <option value="iPhone 13 Pro Max">iPhone 13 Pro Max</option>
-                    <option value="iPhone 14">iPhone 14</option>
-                    <option value="iPhone 14 Pro">iPhone 14 Pro</option>
-                    <option value="iPhone 14 Pro Max">iPhone 14 Pro Max</option>
-                    <option value="iPhone 15">iPhone 15</option>
-                    <option value="iPhone 15 Pro">iPhone 15 Pro</option>
-                    <option value="iPhone 15 Pro Max">iPhone 15 Pro Max</option>
-                    <option value="iPhone 16">iPhone 16</option>
-                    <option value="iPhone 16 Pro">iPhone 16 Pro</option>
-                    <option value="iPhone 16 Pro Max">iPhone 16 Pro Max</option>
+                    <option value="iPhone 13">iPhone 13</option><option value="iPhone 14">iPhone 14</option>
+                    <option value="iPhone 15">iPhone 15</option><option value="iPhone 16">iPhone 16</option>
                     <option value="iPhone 17">iPhone 17</option>
-                    <option value="iPhone 17 Pro">iPhone 17 Pro</option>
-                    <option value="iPhone 17 Pro Max">iPhone 17 Pro Max</option>
-                </select>`;
-            }
+                </select>` : '';
 
             const card = `
             <div class="card ${p.out ? 'sold-out' : ''}">
-                ${p.out ? '<div class="sold-out-badge">SOLD OUT</div>' : ''}
-                <img src="${p.img}" class="card-img" onerror="this.src='logo .jpeg'">
+                ${p.out ? `<div class="sold-out-badge">${t.soldOut}</div>` : ''}
+                <img src="${p.img}" class="card-img" onclick="somo.openModal(this.src)" onerror="this.src='logo .jpeg'">
                 <div class="card-body">
                     <p style="font-weight:700;">${p.name}</p>
                     <p class="price">${p.price} QR</p>
                     ${modelSelector}
-                    <button class="btn btn-gold" onclick="somo.addToCart(${p.id})">${p.out ? 'Sold Out' : 'Add to Cart'}</button>
+                    <button class="btn btn-gold" onclick="somo.addToCart(${p.id})">${p.out ? t.soldOut : t.addCart}</button>
                     ${isAdmin ? `
                         <div style="margin-top:10px; display:flex; gap:5px;">
                             <button onclick="somo.toggleStock(${p.id})" style="flex:1; font-size:10px; background:#444; color:#fff; border:none; padding:5px; cursor:pointer;">Stock</button>
@@ -272,7 +386,6 @@ const somo = {
                         </div>` : ''}
                 </div>
             </div>`;
-            
             if(grids[p.type]) grids[p.type].innerHTML += card;
         });
         this.updateGCList();
@@ -283,61 +396,54 @@ const somo = {
     addToCart(id) {
         const product = this.db.products.find(x => x.id === id);
         if(!product || product.out) return;
-
-        let selectedModel = '';
-        if (product.type === 'cover') {
-            const dropdown = document.getElementById(`model-${id}`);
-            if (dropdown) selectedModel = dropdown.value;
-        }
-
+        let selectedModel = product.type === 'cover' ? document.getElementById(`model-${id}`).value : '';
         const cartItemName = selectedModel ? `${product.name} (${selectedModel})` : product.name;
         const existing = this.cart.find(x => x.id === id && x.model === selectedModel);
-        
-        if (existing) {
-            existing.qty++;
-        } else {
-            this.cart.push({ ...product, name: cartItemName, model: selectedModel, qty: 1 });
-        }
-        
-        this.updateCartUI();
-        toggleCart(true);
+        if (existing) { existing.qty++; } else { this.cart.push({ ...product, name: cartItemName, model: selectedModel, qty: 1 }); }
+        this.updateCartUI(); this.showToast();
     },
 
+    showToast() { const t = document.getElementById('cartToast'); t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2000); },
+
+    changeQty(idx, delta) { this.cart[idx].qty += delta; if(this.cart[idx].qty < 1) { this.remCart(idx); } else { this.updateCartUI(); } },
+
     updateCartUI() {
-        const list = document.getElementById('cartList');
-        if(!list) return;
+        const list = document.getElementById('cartList'); if(!list) return;
         list.innerHTML = this.cart.map((item, idx) => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:10px;">
-                <div><p style="font-weight:700;">${item.name}</p><p style="color:var(--gold); font-size:12px;">${item.price} QR x ${item.qty}</p></div>
-                <button onclick="somo.remCart(${idx})" style="color:red; background:none; border:none; cursor:pointer;">&times;</button>
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px; border-bottom:1px solid #222; padding-bottom:15px;">
+                <img src="${item.img}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#fff;">
+                <div style="flex:1;">
+                    <p style="font-weight:700; font-size:14px;">${item.name}</p>
+                    <p style="color:var(--gold); font-size:12px;">${item.price} QR</p>
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+                        <button onclick="somo.changeQty(${idx}, -1)" style="background:#222; color:#fff; border:none; width:25px; height:25px; border-radius:5px; cursor:pointer;">-</button>
+                        <span>${item.qty}</span>
+                        <button onclick="somo.changeQty(${idx}, 1)" style="background:#222; color:#fff; border:none; width:25px; height:25px; border-radius:5px; cursor:pointer;">+</button>
+                    </div>
+                </div>
+                <button onclick="somo.remCart(${idx})" style="color:red; background:none; border:none; cursor:pointer; font-size:18px;">&times;</button>
             </div>`).join('');
-        
         let sub = this.cart.reduce((a, b) => a + (b.price * b.qty), 0);
         let disc = this.activeGC ? Math.min(sub, this.activeGC.balance) : 0;
         document.getElementById('subT').innerText = sub + " QR";
         document.getElementById('totalT').innerText = (sub - disc) + " QR";
         document.getElementById('cartCount').innerText = this.cart.length;
+        const floatingCount = document.getElementById('floatingCartCount');
+        if(floatingCount) floatingCount.innerText = this.cart.length;
     },
 
     remCart(idx) { this.cart.splice(idx, 1); this.updateCartUI(); },
 
     createGiftCard() {
-        let val = parseInt(document.getElementById('gcVal').value);
-        if(!val) return;
+        let val = parseInt(document.getElementById('gcVal').value); if(!val) return;
         let code = "SOMO-" + Math.random().toString(36).substr(2, 5).toUpperCase();
-        this.db.giftCards.push({ code, balance: val });
-        this.save(); this.updateGCList();
+        this.db.giftCards.push({ code, balance: val }); this.save(); this.updateGCList();
         document.getElementById('gcVal').value = "";
     },
 
     updateGCList() {
-        const container = document.getElementById('activeGCList');
-        if(!container) return;
-        container.innerHTML = this.db.giftCards.map((c, i) => `
-            <div class="gc-list-item">
-                <span><b>${c.code}</b> (${c.balance} QR)</span>
-                <span onclick="somo.delGC(${i})" style="color:red; cursor:pointer;">Del</span>
-            </div>`).join('');
+        const container = document.getElementById('activeGCList'); if(!container) return;
+        container.innerHTML = this.db.giftCards.map((c, i) => `<div class="gc-list-item"><span><b>${c.code}</b> (${c.balance} QR)</span><span onclick="somo.delGC(${i})" style="color:red; cursor:pointer;">Del</span></div>`).join('');
     },
 
     delGC(i) { this.db.giftCards.splice(i, 1); this.save(); this.updateGCList(); },
@@ -353,60 +459,45 @@ const somo = {
     checkout() {
         let name = document.getElementById('custName').value;
         let phone = document.getElementById('custPhone').value;
-        let payment = document.getElementById('payMethod').value;
-        
+        let pMethodSelect = document.getElementById('payMethod');
+        let payment = pMethodSelect.options[pMethodSelect.selectedIndex].text;
         if(!name || this.cart.length === 0) return alert("Please enter your name and add items to your cart.");
-        
         let items = this.cart.map(i => `• ${i.name} (x${i.qty})`).join('%0A');
         let total = document.getElementById('totalT').innerText;
-        
-        let message = `⚜️ *NEW ORDER* ⚜️%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Payment Method:* ${payment}%0A%0A*Order Details:*%0A${items}%0A%0A*Total:* ${total}`;
-        
+        let message = `⚜️ *NEW ORDER* ⚜️%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Payment:* ${payment}%0A%0A*Items:*%0A${items}%0A%0A*Total:* ${total}`;
         window.open(`https://wa.me/97433123213?text=${message}`);
         this.db.stats.rev += parseInt(total); this.db.stats.orders++; this.save();
         this.cart = []; this.updateCartUI(); toggleCart(false); this.updateStats();
     },
 
     addItem() {
-        let name = document.getElementById('addName').value;
-        let price = parseInt(document.getElementById('addPrice').value);
-        let type = document.getElementById('addType').value;
-        let img = document.getElementById('addImg').value;
+        let name = document.getElementById('addName').value; let price = parseInt(document.getElementById('addPrice').value);
+        let type = document.getElementById('addType').value; let img = document.getElementById('addImg').value;
         if(!name || !price || !img) return alert("Fill all fields");
         this.db.products.push({ id: Date.now(), name, price, type, img, out: false });
         this.save(); this.render(); this.updateStats();
         document.getElementById('addName').value = ""; document.getElementById('addPrice').value = "";
     },
 
-    toggleStock(id) {
-        let p = this.db.products.find(x => x.id === id);
-        if(p) { p.out = !p.out; this.save(); this.render(); }
-    },
-
+    toggleStock(id) { let p = this.db.products.find(x => x.id === id); if(p) { p.out = !p.out; this.save(); this.render(); } },
     deleteItem(id) { this.db.products = this.db.products.filter(x => x.id !== id); this.save(); this.render(); },
-    
     updateStats() {
-        const rev = document.getElementById('revStat');
-        const seal = document.getElementById('sealStat');
-        const inv = document.getElementById('invStat');
-        if(rev) rev.innerText = this.db.stats.rev + " QR";
-        if(seal) seal.innerText = this.db.stats.orders;
-        if(inv) inv.innerText = this.db.products.length;
+        const rev = document.getElementById('revStat'), seal = document.getElementById('sealStat'), inv = document.getElementById('invStat');
+        if(rev) rev.innerText = this.db.stats.rev + " QR"; if(seal) seal.innerText = this.db.stats.orders; if(inv) inv.innerText = this.db.products.length;
     }
 };
 
 function toggleCart(open) {
-    const side = document.getElementById('cartSidebar');
-    const over = document.getElementById('overlay');
-    if(side) side.classList.toggle('active', open);
-    if(over) over.classList.toggle('active', open);
+    const side = document.getElementById('cartSidebar'), over = document.getElementById('overlay');
+    if(side) side.classList.toggle('active', open); if(over) over.classList.toggle('active', open);
 }
 
-// Start the app
 somo.init();
 </script>
 </body>
 </html>
+
+
 
 
 
